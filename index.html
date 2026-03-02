@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>NovaStore | Mini E-Commerce</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Mini e-commerce (HTML/CSS/JS) with cart drawer, quantities, totals, checkout, dark/light, glass UI."/>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- Top progress -->
+  <div class="progress" aria-hidden="true">
+    <div class="progress__bar" id="progressBar"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container nav">
+      <a class="logo" href="#" aria-label="NovaStore home">NovaStore</a>
+
+      <div class="filters" role="tablist" aria-label="Product filters">
+        <button class="chip is-active" data-filter="all" role="tab" aria-selected="true">All</button>
+        <button class="chip" data-filter="tech" role="tab" aria-selected="false">Tech</button>
+        <button class="chip" data-filter="fashion" role="tab" aria-selected="false">Fashion</button>
+        <button class="chip" data-filter="home" role="tab" aria-selected="false">Home</button>
+      </div>
+
+      <div class="nav__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme">
+          <span class="icon" aria-hidden="true">☾</span>
+          <span class="txt">Theme</span>
+        </button>
+
+        <button class="cart-btn" id="cartOpen" type="button" aria-label="Open cart">
+          🛒 <span class="count" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="container">
+    <!-- SHOP VIEW -->
+    <section id="viewShop" class="view is-active">
+      <div class="hero glass">
+        <div>
+          <h1>Modern store front — client-ready</h1>
+          <p>
+            Filter products, open quick view, add to cart, adjust quantity, remove items,
+            see totals, and checkout — all in vanilla JS.
+          </p>
+          <div class="hero__badges">
+            <span class="badge">Glass UI</span>
+            <span class="badge">Dark/Light</span>
+            <span class="badge">Cart + Checkout</span>
+          </div>
+        </div>
+
+        <div class="hero__kpi">
+          <div class="kpi">
+            <span class="k">Items</span>
+            <span class="v" id="kpiItems">0</span>
+          </div>
+          <div class="kpi">
+            <span class="k">Subtotal</span>
+            <span class="v" id="kpiSubtotal">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" id="productGrid" aria-live="polite"></div>
+    </section>
+
+    <!-- CHECKOUT VIEW -->
+    <section id="viewCheckout" class="view">
+      <div class="checkout glass">
+        <div class="checkout__head">
+          <div>
+            <h2>Checkout</h2>
+            <p>Demo checkout form (validation). No payments wired.</p>
+          </div>
+          <div class="checkout__actions">
+            <button class="btn btn--ghost" id="backToShop" type="button">← Back to shop</button>
+          </div>
+        </div>
+
+        <div class="checkout__grid">
+          <form class="form" id="checkoutForm" novalidate>
+            <div class="row">
+              <label>
+                Full name
+                <input name="name" type="text" placeholder="e.g., Dan Fred" required minlength="2" />
+                <small class="err"></small>
+              </label>
+              <label>
+                Email
+                <input name="email" type="email" placeholder="e.g., dan@example.com" required />
+                <small class="err"></small>
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                Address
+                <input name="address" type="text" placeholder="Street, City" required minlength="6" />
+                <small class="err"></small>
+              </label>
+              <label>
+                Postcode
+                <input name="postcode" type="text" placeholder="e.g., B1 1AA" required minlength="4" />
+                <small class="err"></small>
+              </label>
+            </div>
+
+            <label>
+              Notes (optional)
+              <textarea name="notes" rows="4" placeholder="Delivery notes…"></textarea>
+              <small class="err"></small>
+            </label>
+
+            <button class="btn" type="submit">Place Order</button>
+            <p class="note" id="checkoutNote" role="status" aria-live="polite"></p>
+          </form>
+
+          <aside class="summary">
+            <h3>Order summary</h3>
+            <div class="summary__rows" id="summaryRows"></div>
+
+            <div class="summary__line"></div>
+
+            <div class="summary__totals">
+              <div class="trow"><span>Subtotal</span><strong id="sumSubtotal">$0.00</strong></div>
+              <div class="trow"><span>Shipping</span><strong id="sumShipping">$0.00</strong></div>
+              <div class="trow"><span>Tax</span><strong id="sumTax">$0.00</strong></div>
+              <div class="trow big"><span>Total</span><strong id="sumTotal">$0.00</strong></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- QUICK VIEW MODAL -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal__panel glass" role="dialog" aria-modal="true" aria-label="Product quick view">
+      <button class="modal__close" id="modalClose" aria-label="Close">✕</button>
+      <div class="modal__thumb" id="modalThumb" aria-hidden="true"></div>
+      <div class="modal__body">
+        <h3 id="modalTitle">Product</h3>
+        <p class="muted" id="modalDesc"></p>
+        <div class="modal__row">
+          <strong id="modalPrice">$0.00</strong>
+          <button class="btn" id="modalAdd" type="button">Add to cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CART DRAWER -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <aside class="drawer__panel glass" role="dialog" aria-modal="true" aria-label="Cart">
+      <div class="drawer__top">
+        <strong>Your cart</strong>
+        <button class="icon-btn" id="cartClose" type="button" aria-label="Close cart">✕</button>
+      </div>
+
+      <div class="drawer__items" id="cartItems" aria-live="polite"></div>
+
+      <div class="drawer__bottom">
+        <div class="totals">
+          <div class="trow"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
+          <div class="trow"><span>Shipping</span><strong id="cartShipping">$0.00</strong></div>
+          <div class="trow"><span>Tax</span><strong id="cartTax">$0.00</strong></div>
+          <div class="trow big"><span>Total</span><strong id="cartTotal">$0.00</strong></div>
+        </div>
+
+        <div class="drawer__actions">
+          <button class="btn btn--ghost" id="clearCart" type="button">Clear</button>
+          <button class="btn" id="goCheckout" type="button">Checkout</button>
+        </div>
+
+        <p class="micro muted">Demo cart (LocalStorage). Connect to Stripe later.</p>
+      </div>
+    </aside>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
